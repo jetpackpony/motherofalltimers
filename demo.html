@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title></title>
+  </head>
+  <body>
+    <svg
+          style="margin: 100;"
+          version="1.1"
+          baseProfile="full"
+          width="400"
+          height="400"
+          xmlns="http://www.w3.org/2000/svg">
+
+
+
+    </svg>
+    <script>
+function polarToCartesian(x, y, r, angle) {
+  let rad = angle * Math.PI / 180.0;
+  return {
+    x: x + r * Math.cos(rad),
+    y: y - r * Math.sin(rad)
+  };
+}
+
+function calculateTimerRim(cx, cy, r, percent) {
+  let startAngle = 90;
+  let endAngle = 360 * (1 - percent) + 90;
+
+  let start = polarToCartesian(cx, cy, r, startAngle);
+  let end = polarToCartesian(cx, cy, r, endAngle);
+
+  let isLargeArc = (endAngle - startAngle <= 180) ? "1" : "0";
+
+  return `M${start.x} ${start.y} A ${r} ${r} 0 ${isLargeArc} 1 ${end.x} ${end.y}`;
+}
+
+function buildTimerRim(dots) {
+  let path = document.createElementNS("http://www.w3.org/2000/svg", 'path');
+  path.setAttribute('stroke', "red");
+  path.setAttribute('stroke-width', "5");
+  path.setAttribute('fill', "transparent");
+  path.setAttribute('d', dots);
+  return path;
+}
+
+function drawTimerRim(cx, cy, r, percent) {
+  let path = document.querySelector('svg path');
+  if (path) {
+    document.querySelector('svg').removeChild(path);
+  }
+  document
+    .querySelector('svg')
+    .appendChild(
+        buildTimerRim(calculateTimerRim(cx, cy, r, percent))
+        );
+}
+
+let progress = 1;
+
+let interval = setInterval(() => {
+  progress -= 0.01;
+  if (progress > 0) {
+    drawTimerRim(110, 110, 100, progress);
+  } else {
+    clearInterval(interval);
+    console.log("Done!");
+  }
+}, 100);
+    </script>
+  </body>
+</html>
